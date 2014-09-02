@@ -30,6 +30,7 @@ class LessphpFilter implements DependencyExtractorInterface
     private $presets = array();
     private $formatter;
     private $preserveComments;
+    private $importCss;
 
     /**
      * Lessphp Load Paths
@@ -79,6 +80,14 @@ class LessphpFilter implements DependencyExtractorInterface
         $this->preserveComments = $preserveComments;
     }
 
+    /**
+     * @param boolean $importCss
+     */
+    public function setImportCss($importCss)
+    {
+        $this->importCss = $importCss;
+    }
+
     public function filterLoad(AssetInterface $asset)
     {
         $root = $asset->getSourceRoot();
@@ -100,6 +109,8 @@ class LessphpFilter implements DependencyExtractorInterface
         if (null !== $this->preserveComments) {
             $lc->setPreserveComments($this->preserveComments);
         }
+		
+		$lc->importCss = ($this->importCss == true);
 
         $asset->setContent($lc->parse($asset->getContent(), $this->presets));
     }
