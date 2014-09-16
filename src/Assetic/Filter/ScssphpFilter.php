@@ -29,6 +29,8 @@ class ScssphpFilter implements DependencyExtractorInterface
 
     private $importPaths = array();
 
+    private $formatter = 'scss_formatter';
+
     public function enableCompass($enable = true)
     {
         $this->compass = (Boolean) $enable;
@@ -55,7 +57,16 @@ class ScssphpFilter implements DependencyExtractorInterface
             $lc->addImportPath($path);
         }
 
+        if ($this->formatter) {
+            $lc->setFormatter($this->formatter);
+        }
+
         $asset->setContent($lc->compile($asset->getContent()));
+    }
+
+    public function setFormatter($formatter)
+    {
+        $this->formatter = $formatter;
     }
 
     public function setImportPaths(array $paths)
