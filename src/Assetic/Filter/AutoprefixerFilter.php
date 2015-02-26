@@ -13,14 +13,15 @@ namespace Assetic\Filter;
 
 use Assetic\Asset\AssetInterface;
 use Assetic\Exception\FilterException;
+use Assetic\Util\FilesystemUtils;
 
 /**
  * Parses CSS and adds vendor prefixes to rules using values from the Can I Use website
- * 
+ *
  * @link https://github.com/ai/autoprefixer
  * @author Alex Vasilenko <aa.vasilenko@gmail.com>
  */
-class AutoprefixerFilter extends BaseNodeFilter 
+class AutoprefixerFilter extends BaseNodeFilter
 {
     /**
      * @var string
@@ -57,20 +58,20 @@ class AutoprefixerFilter extends BaseNodeFilter
     {
         $input = $asset->getContent();
         $pb = $this->createProcessBuilder(array($this->autoprefixerBin));
-        
+
         $pb->setInput($input);
         if ($this->browsers) {
             $pb->add('-b')->add(implode(',', $this->browsers));
         }
-        
-        $output = tempnam(sys_get_temp_dir(), 'assetic_autoprefixer');
+
+        $output = FilesystemUtils::createTemporaryFile('autoprefixer');
         $pb->add('-o')->add($output);
-        
+
         $proc = $pb->getProcess();
         if (0 !== $proc->run()) {
             throw FilterException::fromProcess($proc)->setInput($asset->getContent());
         }
-        
+
         $asset->setContent(file_get_contents($output));
         unlink($output);
     }

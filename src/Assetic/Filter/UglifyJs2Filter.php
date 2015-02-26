@@ -13,6 +13,7 @@ namespace Assetic\Filter;
 
 use Assetic\Asset\AssetInterface;
 use Assetic\Exception\FilterException;
+use Assetic\Util\FilesystemUtils;
 
 /**
  * UglifyJs2 filter.
@@ -87,6 +88,10 @@ class UglifyJs2Filter extends BaseNodeFilter
 
         if ($this->compress) {
             $pb->add('--compress');
+
+            if (is_string($this->compress) && !empty($this->compress)) {
+                $pb->add($this->compress);
+            }
         }
 
         if ($this->beautify) {
@@ -110,12 +115,12 @@ class UglifyJs2Filter extends BaseNodeFilter
         }
 
         if ($this->defines) {
-            $pb->add('--define')->add(join(',', $this->defines));
+            $pb->add('--define')->add(implode(',', $this->defines));
         }
 
         // input and output files
-        $input = tempnam(sys_get_temp_dir(), 'input');
-        $output = tempnam(sys_get_temp_dir(), 'output');
+        $input  = FilesystemUtils::createTemporaryFile('uglifyjs2_in');
+        $output = FilesystemUtils::createTemporaryFile('uglifyjs2_out');
 
         file_put_contents($input, $asset->getContent());
         $pb->add('-o')->add($output)->add($input);
